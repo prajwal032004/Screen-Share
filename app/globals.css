@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0f;
+  --foreground: #ffffff;
+  --accent-primary: #00f5ff;
+  --accent-secondary: #a855f7;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism Classes */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.neon-glow {
+  box-shadow: 0 0 20px #00f5ff40;
+}
+
+.neon-text {
+  text-shadow: 0 0 10px #00f5ff80;
+}
+
+/* Background gradient mesh */
+.bg-mesh {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  background: radial-gradient(circle at 15% 50%, rgba(168, 85, 247, 0.15), transparent 25%),
+              radial-gradient(circle at 85% 30%, rgba(0, 245, 255, 0.15), transparent 25%);
+  filter: blur(60px);
+}
