@@ -17,10 +17,15 @@ export class WebRTCManager {
   private isHost: boolean;
   private roomId: string;
   private onTrackCallback?: (stream: MediaStream) => void;
+  private pendingCandidates: RTCIceCandidateInit[] = [];
 
   constructor(isHost: boolean, roomId: string) {
     this.isHost = isHost;
     this.roomId = roomId;
+
+    if (!this.isHost) {
+      this.createPeerConnection();
+    }
 
     socket.on('signal:offer', async ({ offer, from }) => {
       if (this.isHost) return;
@@ -29,6 +34,15 @@ export class WebRTCManager {
       const answer = await this.peerConnection!.createAnswer();
       await this.peerConnection!.setLocalDescription(answer);
       socket.emit('signal:answer', { answer, to: from });
+
+      for (const candidate of this.pendingCandidates) {
+        try {
+          await this.peerConnection!.addIceCandidate(new RTCIceCandidate(candidate));
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      this.pendingCandidates = [];
     });
 
     socket.on('signal:answer', async ({ answer }) => {
@@ -37,11 +51,18 @@ export class WebRTCManager {
     });
 
     socket.on('signal:ice', async ({ candidate }) => {
-      if (!this.peerConnection) return;
-      try {
-        await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-      } catch (e) {
-        console.error('Error adding received ice candidate', e);
+      if (!this.peerConnection) {
+        this.pendingCandidates.push(candidate);
+        return;
+      }
+      if (this.peerConnection.remoteDescription) {
+        try {
+          await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        } catch (e) {
+          console.error('Error adding received ice candidate', e);
+        }
+      } else {
+        this.pendingCandidates.push(candidate);
       }
     });
   }
