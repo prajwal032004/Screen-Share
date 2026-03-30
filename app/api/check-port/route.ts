@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Very basic port check by trying to connect locally (Useful for localhost debugging)
-  return new Promise((resolve) => {
+  return new Promise<NextResponse>((resolve) => {
     const req = http.get(`http://127.0.0.1:${port}`, (res) => {
       resolve(NextResponse.json({ success: true, port, open: true }));
     });
