@@ -5,6 +5,7 @@ export default function AudioVisualizer({ stream }: { stream: MediaStream | null
 
   useEffect(() => {
     if (!stream || !canvasRef.current) return;
+    if (stream.getAudioTracks().length === 0) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
