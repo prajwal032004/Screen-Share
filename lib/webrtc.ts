@@ -55,10 +55,17 @@ export class WebRTCManager {
       }
     };
 
+    this.peerConnection.onnegotiationneeded = async () => {
+      if (this.isHost) {
+        await this.createOffer(peerId);
+      }
+    };
+
     if (!this.isHost) {
       this.peerConnection.ontrack = (event) => {
-        if (this.onTrackCallback && event.streams[0]) {
-          this.onTrackCallback(event.streams[0]);
+        if (this.onTrackCallback) {
+          const stream = event.streams[0] || new MediaStream([event.track]);
+          this.onTrackCallback(stream);
         }
       };
     }
